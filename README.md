@@ -163,10 +163,14 @@ grafos/
 ├── README.md
 └── run_experiments.sh
 ```
----
 
-*Lucas França Neves*
-*Matheus Leal Costa*
-*Gabriel Giacomo Paes*
-*Álvaro Davi Carneiro dos Santos*
-*João Victor Pereira*
+## Autores
+
+- Lucas França Neves
+- Matheus Leal Costa
+- Gabriel Giacomo Paes
+- Álvaro Davi Carneiro dos Santos
+- João Victor Pereira
+
+DCC059 - Teoria dos Grafos  
+Universidade Federal de Juiz de Fora

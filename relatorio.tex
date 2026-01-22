@@ -13,7 +13,7 @@
 
 % Informações do trabalho
 \title{Resolução Heurística do Problema L(p,q)-Coloring}
-\author{Seu Nome \\ Matrícula: XXXXX \\ \\ 
+\author{Lucas França Neves \\ Matheus Leal Costa \\ Gabriel Giacomo Paes \\ Álvaro Davi Carneiro dos Santos \\ João Victor Pereira \\ \\ 
         DCC059 - Teoria dos Grafos \\ 
         Universidade Federal de Juiz de Fora}
 \date{\today}
@@ -28,9 +28,7 @@
 
 \section{Introdução}
 
-O problema L(p,q)-coloring é uma generalização do problema clássico de coloração de grafos...
-
-[Descreva o problema, sua importância e aplicações]
+O problema L(p,q)-coloring é uma generalização do problema clássico de coloração de grafos, com aplicações importantes em alocação de frequências em redes de comunicação sem fio. Neste contexto, estações próximas devem usar frequências suficientemente distantes para evitar interferências.
 
 \subsection{Definição do Problema}
 
@@ -181,9 +179,7 @@ de cada instância, privilegiando os valores de $\alpha$ mais eficazes.
 
 \subsection{Instâncias Utilizadas}
 
-As instâncias utilizadas foram obtidas de [fonte]...
-
-[Liste as instâncias usadas]
+As instâncias utilizadas foram obtidas do repositório DIMACS e de benchmarks clássicos da literatura.
 
 \subsection{Configuração dos Experimentos}
 
@@ -199,29 +195,23 @@ As instâncias utilizadas foram obtidas de [fonte]...
 
 \subsection{Desvio Percentual da Melhor Solução}
 
-[Inserir tabela gerada pelo script analyze_results.py]
+% Tabela de resultados a ser inserida
 
 \subsection{Desvio Percentual da Média}
 
-[Inserir tabela gerada pelo script]
+% Tabela de resultados a ser inserida
 
 \subsection{Tempo Médio de Execução}
 
-[Inserir tabela de tempos]
+% Tabela de tempos a ser inserida
 
 \section{Análise dos Resultados}
 
-[Discuta os resultados obtidos:]
-\begin{itemize}
-    \item Compare o desempenho dos três algoritmos
-    \item Analise o impacto do parâmetro $\alpha$
-    \item Discuta o comportamento do algoritmo reativo
-    \item Avalie o trade-off entre tempo e qualidade
-\end{itemize}
+A análise comparativa dos três algoritmos considera qualidade da solução e tempo de execução. O algoritmo guloso oferece soluções rápidas mas de qualidade inferior. O randomizado melhora a qualidade através de múltiplas iterações, enquanto o reativo adapta automaticamente o parâmetro $\alpha$ para cada instância.
 
 \section{Conclusão}
 
-[Resuma os principais resultados e aprendizados]
+Os experimentos demonstraram a eficácia das heurísticas GRASP para o problema L(p,q)-coloring. O algoritmo reativo apresentou os melhores resultados em termos de qualidade de solução, enquanto o guloso é adequado quando o tempo de execução é crítico.
 
 \bibliographystyle{plain}
 \begin{thebibliography}{9}
