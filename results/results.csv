@@ -1,0 +1,4 @@
+datetime,instance,p,q,algorithm,alpha,iterations,blockSize,seed,executionTime,bestSolution,avgSolution,bestAlpha
+2026-01-21 03:33:35,instances/exemplo.col,2,1,greedy,N/A,-1,0,1768977215,0.000004,6,6.00,0.000
+2026-01-21 03:33:35,instances/exemplo.col,2,1,randomized,0.30,30,0,1768977215,0.000156,6,6.00,0.300
+2026-01-21 03:33:35,instances/exemplo.col,2,1,reactive,0.02;0.05;0.10;0.15,50,20,1768977215,0.000248,6,6.00,0.020

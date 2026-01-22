@@ -1,0 +1,236 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage[left=3cm,right=2cm,top=3cm,bottom=2cm]{geometry}
+
+% Informações do trabalho
+\title{Resolução Heurística do Problema L(p,q)-Coloring}
+\author{Seu Nome \\ Matrícula: XXXXX \\ \\ 
+        DCC059 - Teoria dos Grafos \\ 
+        Universidade Federal de Juiz de Fora}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Introdução}
+
+O problema L(p,q)-coloring é uma generalização do problema clássico de coloração de grafos...
+
+[Descreva o problema, sua importância e aplicações]
+
+\subsection{Definição do Problema}
+
+Dado um grafo simples não direcionado $G = (V, E)$ e dois inteiros não negativos $p$ e $q$, 
+o problema L(p,q)-coloring consiste em encontrar uma coloração $f: V \rightarrow \mathbb{Z}^+$ 
+dos vértices tal que:
+
+\begin{itemize}
+    \item Se $u$ e $v$ são vértices adjacentes (distância 1), então $|f(u) - f(v)| \geq p$
+    \item Se $u$ e $v$ estão a distância 2, então $|f(u) - f(v)| \geq q$
+\end{itemize}
+
+O objetivo é minimizar a maior cor utilizada na coloração.
+
+\section{Algoritmos Implementados}
+
+\subsection{Algoritmo Guloso}
+
+O algoritmo guloso implementado utiliza uma heurística construtiva aprimorada e determinística. 
+A estratégia consiste em ordenar os vértices considerando tanto o grau direto quanto o número 
+de vizinhos a distância 2, e então colorir cada vértice sequencialmente com a menor cor válida possível.
+
+A ordenação aprimorada é crucial para o problema L(p,q)-coloring, pois vértices com maior 
+grau combinado (direto + distância 2) tendem a ter mais restrições. Ao colori-los primeiro, 
+reduz-se significativamente a chance de conflitos nas etapas finais. Para cada vértice, o 
+algoritmo busca a menor cor (iniciando em 0) que satisfaça ambas as restrições: diferença 
+$\geq p$ com vizinhos diretos e diferença $\geq q$ com vizinhos a distância 2.
+
+Esta heurística mostrou-se superior à ordenação simples por grau, produzindo soluções de 
+melhor qualidade em grafos densos.
+
+\begin{algorithm}
+\caption{Algoritmo Guloso para L(p,q)-Coloring}
+\begin{algorithmic}[1]
+\State $V \gets$ vértices ordenados por $(grau + |N_2|)$ decrescente
+\Comment{$N_2$ = vizinhos a distância 2}
+\State $coloring \gets$ vetor de tamanho $|V|$ inicializado com $-1$
+\State $maxColor \gets 0$
+\For{cada vértice $v \in V$}
+    \State $cor \gets 0$
+    \While{$\neg$ isValidColor$(v, cor, coloring)$}
+        \State $cor \gets cor + 1$
+    \EndWhile
+    \State $coloring[v] \gets cor$
+    \State $maxColor \gets \max(maxColor, cor)$
+\EndFor
+\State \Return $(coloring, maxColor)$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Algoritmo Guloso Randomizado}
+
+O algoritmo guloso randomizado é baseado na técnica GRASP (Greedy Randomized Adaptive Search Procedure). 
+Em vez de sempre escolher o vértice com menor custo, ele introduz aleatoriedade através de uma 
+Lista Restrita de Candidatos (RCL).
+
+O parâmetro $\alpha \in [0,1]$ controla o grau de aleatoriedade: com $\alpha = 0$, o algoritmo 
+é puramente guloso (escolhe sempre o melhor candidato), enquanto $\alpha = 1$ torna a escolha 
+completamente aleatória. O custo de cada vértice não colorido combina a menor cor válida 
+necessária com o \textbf{grau de saturação} (número de vizinhos já coloridos), priorizando 
+vértices mais restritos. Especificamente, o custo é definido como:
+
+$$cost(v) = minColor(v) \times 100 - saturationDegree(v)$$
+
+A RCL contém todos os vértices cujo custo está dentro de um limiar 
+$threshold = minCost + \alpha \cdot (maxCost - minCost)$.
+
+O algoritmo executa múltiplas iterações (geralmente 30-50) e, ao final, aplica uma 
+\textbf{busca local} para refinar a melhor solução encontrada, tentando recolorir vértices 
+com cores altas em cores menores.
+
+\begin{algorithm}
+\caption{Algoritmo Guloso Randomizado}
+\begin{algorithmic}[1]
+\State $bestSol \gets \emptyset$
+\For{$iter = 1$ até $iterations$}
+    \State $coloring \gets$ vetor inicializado com $-1$
+    \State $uncolored \gets$ todos os vértices
+    \While{$uncolored \neq \emptyset$}
+        \For{cada $v \in uncolored$}
+            \State $minColor \gets$ findSmallestValidColor$(v, coloring)$
+            \State $satDegree \gets$ número de vizinhos coloridos de $v$
+            \State $cost[v] \gets minColor \times 100 - satDegree$
+        \EndFor
+        \State $minCost \gets \min(cost)$, $maxCost \gets \max(cost)$
+        \State $threshold \gets minCost + \alpha \cdot (maxCost - minCost)$
+        \State $RCL \gets \{v \in uncolored : cost[v] \leq threshold\}$
+        \State $v^* \gets$ escolher aleatoriamente de $RCL$
+        \State $coloring[v^*] \gets$ findSmallestValidColor$(v^*, coloring)$
+        \State $uncolored \gets uncolored \setminus \{v^*\}$
+    \EndWhile
+    \State $bestSol \gets$ atualizar se solução atual for melhor
+\EndFor
+\State $bestSol \gets$ localSearch$(bestSol)$ \Comment{Refinamento}
+\State \Return $bestSol$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Algoritmo Guloso Randomizado Reativo}
+
+O algoritmo reativo é uma extensão do GRASP que adapta automaticamente o parâmetro $\alpha$ 
+durante a execução. Em vez de usar um único valor fixo de $\alpha$, ele trabalha com um 
+conjunto de valores candidatos cuidadosamente escolhidos e ajusta dinamicamente as probabilidades 
+de seleção de cada $\alpha$ baseado no desempenho observado.
+
+Nossa implementação utiliza valores de $\alpha$ mais agressivos: $\{0.02, 0.05, 0.10, 0.15\}$, 
+que favorecem escolhas mais gulosas (menor aleatoriedade), resultando em soluções de melhor 
+qualidade para grafos densos. Valores menores de $\alpha$ concentram a busca em candidatos 
+promissores, enquanto ainda mantendo diversificação suficiente.
+
+O algoritmo divide as iterações em blocos (geralmente de tamanho 40-50). Ao final de cada bloco, 
+ele avalia a qualidade média das soluções obtidas com cada $\alpha$ e atualiza as probabilidades 
+de forma proporcional: valores de $\alpha$ que geraram soluções de melhor qualidade recebem 
+probabilidades maiores de serem selecionados no próximo bloco. A qualidade é medida como 
+$q = \frac{1}{1 + maxColor}$, de modo que soluções com menor cor máxima têm maior qualidade.
+
+Após todas as iterações, aplica-se uma \textbf{busca local mais extensa} (até 100 iterações) 
+para refinar a melhor solução encontrada. A implementação é modularizada, com métodos auxiliares 
+para construção de soluções (\texttt{buildSolution}) e atualização de probabilidades 
+(\texttt{updateProbabilities}), facilitando manutenção e extensões futuras.
+
+Este mecanismo de aprendizado permite que o algoritmo se adapte às características específicas 
+de cada instância, privilegiando os valores de $\alpha$ mais eficazes.
+
+\begin{algorithm}
+\caption{Algoritmo Guloso Randomizado Reativo}
+\begin{algorithmic}[1]
+\State $alphas \gets \{0.02, 0.05, 0.10, 0.15\}$
+\State $probabilities \gets$ distribuição uniforme sobre $alphas$
+\State $bestSol \gets \emptyset$, $blockQuality \gets 0$
+\For{$iter = 1$ até $iterations$}
+    \State $\alpha \gets$ selecionar de $alphas$ com probabilidades
+    \State $sol \gets$ buildSolution$(\alpha)$ \Comment{Método modularizado}
+    \State $quality \gets \frac{1}{1 + sol.maxColor}$
+    \State $blockQuality[\alpha] \gets blockQuality[\alpha] + quality$
+    \State $bestSol \gets$ atualizar se $sol$ for melhor
+    \If{$iter \mod blockSize = 0$}
+        \State updateProbabilities$(probabilities, blockQuality, blockUsage)$
+        \State $blockQuality \gets$ resetar para próximo bloco
+    \EndIf
+\EndFor
+\State $bestSol \gets$ localSearch$(bestSol, 100)$ \Comment{Refinamento extenso}
+\State \Return $bestSol$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Metodologia Experimental}
+
+\subsection{Instâncias Utilizadas}
+
+As instâncias utilizadas foram obtidas de [fonte]...
+
+[Liste as instâncias usadas]
+
+\subsection{Configuração dos Experimentos}
+
+\begin{itemize}
+    \item Cada algoritmo foi executado 10 vezes para cada instância
+    \item Valores de $\alpha$ testados: 0.1, 0.3, 0.5
+    \item Algoritmo randomizado: 30 iterações
+    \item Algoritmo reativo: 300 iterações com blocos de 30
+    \item Valores de p e q: [especificar]
+\end{itemize}
+
+\section{Resultados}
+
+\subsection{Desvio Percentual da Melhor Solução}
+
+[Inserir tabela gerada pelo script analyze_results.py]
+
+\subsection{Desvio Percentual da Média}
+
+[Inserir tabela gerada pelo script]
+
+\subsection{Tempo Médio de Execução}
+
+[Inserir tabela de tempos]
+
+\section{Análise dos Resultados}
+
+[Discuta os resultados obtidos:]
+\begin{itemize}
+    \item Compare o desempenho dos três algoritmos
+    \item Analise o impacto do parâmetro $\alpha$
+    \item Discuta o comportamento do algoritmo reativo
+    \item Avalie o trade-off entre tempo e qualidade
+\end{itemize}
+
+\section{Conclusão}
+
+[Resuma os principais resultados e aprendizados]
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+
+\bibitem{griggs92}
+Griggs, J. R., \& Yeh, R. K. (1992). 
+\textit{Labelling graphs with a condition at distance 2}. 
+SIAM Journal on Discrete Mathematics, 5(4), 586-595.
+
+\end{thebibliography}
+
+\end{document}
