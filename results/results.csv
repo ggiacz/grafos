@@ -5,3 +5,5 @@ datetime,instance,p,q,algorithm,alpha,iterations,blockSize,seed,executionTime,be
 2026-01-22 10:47:59,instances/exemplo.col,2,1,greedy,N/A,-1,0,1769089679,0.000023,6,6.00,0.000
 2026-01-22 10:48:05,instances/exemplo.col,2,1,randomized,0.30,50,0,1769089685,0.000386,6,6.00,0.300
 2026-01-22 10:48:29,instances/r250.5.col,2,1,reactive,0.10;0.30;0.50,100,30,1769089690,19.436269,215,215.00,0.100
+2026-01-22 11:00:27,instances/exemplo.col,2,1,greedy,N/A,-1,0,1769090427,0.000020,6,6.00,0.000
+2026-01-22 11:00:48,instances/exemplo.col,2,1,greedy,N/A,-1,0,1769090448,0.000021,6,6.00,0.000
