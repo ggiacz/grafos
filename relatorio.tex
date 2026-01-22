@@ -179,39 +179,138 @@ de cada instância, privilegiando os valores de $\alpha$ mais eficazes.
 
 \subsection{Instâncias Utilizadas}
 
-As instâncias utilizadas foram obtidas do repositório DIMACS e de benchmarks clássicos da literatura.
+As instâncias utilizadas foram obtidas do repositório DIMACS e de benchmarks clássicos da literatura:
+
+\begin{table}[h]
+\centering
+\caption{Instâncias de teste}
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Instância} & \textbf{Vértices} & \textbf{Arestas} & \textbf{Descrição} \\
+\midrule
+exemplo.col & 10 & 15 & Instância pequena de teste \\
+r250.5.col & 250 & 14849 & Grafo aleatório denso \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Configuração dos Experimentos}
 
 \begin{itemize}
-    \item Cada algoritmo foi executado 10 vezes para cada instância
-    \item Valores de $\alpha$ testados: 0.1, 0.3, 0.5
-    \item Algoritmo randomizado: 30 iterações
-    \item Algoritmo reativo: 300 iterações com blocos de 30
-    \item Valores de p e q: [especificar]
+    \item Cada algoritmo foi executado 10 vezes para cada instância (com sementes 1-10)
+    \item Valores de $p = 2$ e $q = 1$
+    \item Algoritmo randomizado: $\alpha = 0.3$, 50 iterações
+    \item Algoritmo reativo: $\alpha \in \{0.02, 0.05, 0.10, 0.15\}$, 100 iterações com blocos de 30
+    \item Ambiente: macOS, compilador clang++ com otimização -O2
 \end{itemize}
 
 \section{Resultados}
 
-\subsection{Desvio Percentual da Melhor Solução}
+\subsection{Resultados para Instância exemplo.col (10 vértices, 15 arestas)}
 
-% Tabela de resultados a ser inserida
+\begin{table}[h]
+\centering
+\caption{Resultados para exemplo.col ($p=2$, $q=1$)}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Algoritmo} & \textbf{Melhor} & \textbf{Média} & \textbf{Pior} & \textbf{Desvio} & \textbf{Tempo Médio (s)} \\
+\midrule
+Guloso & 6 & 6.00 & 6 & 0.00\% & 0.000007 \\
+Randomizado ($\alpha=0.3$) & 6 & 6.00 & 6 & 0.00\% & 0.000399 \\
+Reativo & 6 & 6.00 & 6 & 0.00\% & 0.000394 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection{Desvio Percentual da Média}
+Para a instância pequena, todos os algoritmos encontraram a mesma solução ótima (cor máxima = 6), 
+demonstrando que o problema é trivial para grafos pequenos.
 
-% Tabela de resultados a ser inserida
+\subsection{Resultados para Instância r250.5.col (250 vértices, 14849 arestas)}
 
-\subsection{Tempo Médio de Execução}
+\begin{table}[h]
+\centering
+\caption{Resultados para r250.5.col ($p=2$, $q=1$)}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Algoritmo} & \textbf{Melhor} & \textbf{Média} & \textbf{Pior} & \textbf{Desvio\footnotemark} & \textbf{Tempo Médio (s)} \\
+\midrule
+Guloso & 210 & 210.00 & 210 & 3.96\% & 0.003 \\
+Randomizado ($\alpha=0.3$) & 221 & 223.30 & 225 & 10.54\% & 9.53 \\
+Reativo & \textbf{202} & 203.00 & 205 & \textbf{0.00\%} & 20.26 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\footnotetext{Desvio percentual em relação à melhor solução encontrada (202 pelo algoritmo reativo).}
 
-% Tabela de tempos a ser inserida
+\subsection{Análise Comparativa}
+
+\begin{table}[h]
+\centering
+\caption{Comparação de desempenho entre algoritmos (r250.5.col)}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Algoritmo} & \textbf{Qualidade} & \textbf{Velocidade} & \textbf{Consistência} \\
+\midrule
+Guloso & Boa (210) & Muito Rápido & Alta (determinístico) \\
+Randomizado & Inferior (221-225) & Médio & Baixa (variância alta) \\
+Reativo & \textbf{Melhor (202-205)} & Lento & Alta (variância baixa) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Análise dos Resultados}
 
-A análise comparativa dos três algoritmos considera qualidade da solução e tempo de execução. O algoritmo guloso oferece soluções rápidas mas de qualidade inferior. O randomizado melhora a qualidade através de múltiplas iterações, enquanto o reativo adapta automaticamente o parâmetro $\alpha$ para cada instância.
+Os experimentos revelaram resultados interessantes e alguns contraintuitivos:
+
+\textbf{Algoritmo Guloso:} Surpreendentemente, o algoritmo guloso determinístico obteve 
+resultados melhores do que o randomizado na instância maior, com cor máxima de 210. Isso 
+se deve à ordenação aprimorada por grau combinado (direto + distância 2), que prioriza 
+eficientemente os vértices mais restritos.
+
+\textbf{Algoritmo Randomizado:} O algoritmo randomizado com $\alpha = 0.3$ apresentou 
+desempenho inferior ao guloso (melhores soluções entre 221-225). Isso ocorre porque a 
+aleatoriedade introduzida pelo valor de $\alpha$ pode prejudicar a escolha gulosa em 
+grafos muito densos, onde as restrições são numerosas.
+
+\textbf{Algoritmo Reativo:} O algoritmo reativo obteve os melhores resultados gerais, 
+com cor máxima entre 202-205. Os valores de $\alpha$ mais conservadores 
+($\{0.02, 0.05, 0.10, 0.15\}$) permitiram que o algoritmo mantivesse escolhas mais 
+gulosas enquanto ainda explorava o espaço de soluções. O mecanismo adaptativo convergiu 
+consistentemente para $\alpha = 0.02$, indicando que escolhas quase-gulosas são mais 
+eficazes para esta classe de instância.
 
 \section{Conclusão}
 
-Os experimentos demonstraram a eficácia das heurísticas GRASP para o problema L(p,q)-coloring. O algoritmo reativo apresentou os melhores resultados em termos de qualidade de solução, enquanto o guloso é adequado quando o tempo de execução é crítico.
+Os experimentos demonstraram a eficácia das heurísticas para o problema L(p,q)-coloring, 
+com resultados que variam conforme as características da instância e os parâmetros utilizados.
+
+\textbf{Principais conclusões:}
+
+\begin{enumerate}
+    \item O \textbf{algoritmo reativo} apresentou os melhores resultados em termos de qualidade 
+    de solução, alcançando cor máxima de 202 na instância r250.5.col, uma melhoria de 3.8\% 
+    em relação ao guloso.
+    
+    \item A \textbf{ordenação por grau combinado} (direto + distância 2) mostrou-se crucial 
+    para a qualidade das soluções gulosas.
+    
+    \item Valores de $\alpha$ \textbf{mais conservadores} ($0.02-0.15$) são mais eficazes 
+    para grafos densos, contrariando a intuição de que maior aleatoriedade sempre 
+    beneficia a exploração do espaço de soluções.
+    
+    \item O \textbf{trade-off tempo/qualidade} é evidente: o algoritmo guloso é 
+    aproximadamente 6700x mais rápido que o reativo, mas produz soluções 3.96\% piores.
+    
+    \item A \textbf{busca local} no algoritmo reativo contribui significativamente 
+    para a qualidade final das soluções.
+\end{enumerate}
+
+\textbf{Trabalhos Futuros:}
+\begin{itemize}
+    \item Testar instâncias maiores e de diferentes classes (grafos esparsos, bipartidos, etc.)
+    \item Implementar outras meta-heurísticas como Simulated Annealing ou Algoritmos Genéticos
+    \item Paralelizar as iterações do GRASP para reduzir o tempo de execução
+\end{itemize}
 
 \bibliographystyle{plain}
 \begin{thebibliography}{9}
@@ -220,6 +319,16 @@ Os experimentos demonstraram a eficácia das heurísticas GRASP para o problema 
 Griggs, J. R., \& Yeh, R. K. (1992). 
 \textit{Labelling graphs with a condition at distance 2}. 
 SIAM Journal on Discrete Mathematics, 5(4), 586-595.
+
+\bibitem{resende03}
+Resende, M. G. C., \& Ribeiro, C. C. (2003).
+\textit{Greedy Randomized Adaptive Search Procedures}.
+Handbook of Metaheuristics, Kluwer Academic Publishers, 219-249.
+
+\bibitem{prais00}
+Prais, M., \& Ribeiro, C. C. (2000).
+\textit{Reactive GRASP: An Application to a Matrix Decomposition Problem in TDMA Traffic Assignment}.
+INFORMS Journal on Computing, 12(3), 164-176.
 
 \end{thebibliography}
 
